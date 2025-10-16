@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library Books</title>
+</head>
+<body>
+  <h1>Library Books</h1>
+  <ul id="books-list"></ul>
+
+  <h2>Add a New Book</h2>
+  <form id="add-book-form">
+    <input type="text" id="title" placeholder="Title" required>
+    <input type="text" id="author" placeholder="Author" required>
+    <button type="submit">Add Book</button>
+  </form>
+
+  <script>
+    const booksList = document.getElementById('books-list');
+    const addBookForm = document.getElementById('add-book-form');
+
+    async function fetchBooks() {
+      const response = await fetch('/books');
+      const books = await response.json();
+      booksList.innerHTML = '';
+      books.forEach(book => {
+        const li = document.createElement('li');
+        li.textContent = `${book.title} by ${book.author}`;
+        booksList.appendChild(li);
+      });
+    }
+
+    fetchBooks();
+
+    addBookForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const title = document.getElementById('title').value;
+      const author = document.getElementById('author').value;
+      const response = await fetch('/books', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, author })
+      });
+      if (response.ok) {
+        fetchBooks(); 
+        addBookForm.reset();
+      } else {
+        alert('Error adding book');
+      }
+    });
+  </script>
+</body>
+</html>
